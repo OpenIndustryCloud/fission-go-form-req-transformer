@@ -208,7 +208,7 @@ jobs:
   - get: fission-function-pr
     trigger: true
     version: every
-  - get: oic-ci-tasks-src. fission-go-form-req-transformer
+  - get: oic-ci-tasks-src
   - task: coverage
     file: oic-ci-tasks-src/go/coverage/coverage.yaml
     input_mapping: 
