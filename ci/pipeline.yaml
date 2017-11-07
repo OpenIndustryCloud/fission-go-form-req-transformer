@@ -201,7 +201,7 @@ jobs:
       status: success
       merge:
         method: merge
-        commit_msg: fission-function-merge-pr/README.md
+        commit_msg: fission-function-merge-pr/LAST_MERGE.md
 
 - name: test-pr
   plan:
