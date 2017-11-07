@@ -9,7 +9,6 @@ request along side Weather API Input Data
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -58,16 +57,16 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	var typeFormdata TypeFormData
 	err := json.NewDecoder(r.Body).Decode(&typeFormdata)
 	if err == io.EOF || err != nil {
-		createErrorResponse(w, err.Error(), 400)
+		createErrorResponse(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	//transform type form data manually
 	transformedData := transformData(typeFormdata)
 	transformedDataJSON, err := json.Marshal(&transformedData)
-	fmt.Println("Type form data after transformatin -----> ", string(transformedDataJSON))
+	//fmt.Println("Type form data after transformatin -----> ", string(transformedDataJSON))
 	if err != nil {
-		createErrorResponse(w, err.Error(), 400)
+		createErrorResponse(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -115,7 +114,7 @@ func transformData(typeFormdata TypeFormData) TranformedData {
 		}
 		ticketDetails.Ticket.Comment.HTMLBody = ticketBody
 		//claim specific important data
-		if strings.Compare(claimType, STORM_SURGE_CLAIM) >= 0 {
+		if strings.Compare(claimType, STORM_SURGE_CLAIM) == 0 {
 			//for Storm Surge Claims
 			switch field.ID {
 			case STORM_INCIDENT_DATE:
@@ -163,6 +162,15 @@ func transformData(typeFormdata TypeFormData) TranformedData {
 		transformedData.TicketDetails = ticketDetails
 	}
 	return transformedData
+}
+
+func createErrorResponse(w http.ResponseWriter, message string, status int64) {
+	errorJSON, _ := json.Marshal(&Error{
+		Code:    status,
+		Message: message})
+	//Send custom error message to caller
+	w.Header().Set("content-type", "application/json")
+	w.Write([]byte(errorJSON))
 }
 
 type Error struct {
@@ -283,13 +291,4 @@ type WeatherAPIInput struct {
 	City    string `json:"city,omitempty"`
 	Country string `json:"country,omitempty"`
 	Date    string `json:"date,omitempty"` //YYYYMMDD
-}
-
-func createErrorResponse(w http.ResponseWriter, message string, status int64) {
-	errorJSON, _ := json.Marshal(&Error{
-		Code:    status,
-		Message: message})
-	//Send custom error message to caller
-	w.Header().Set("content-type", "application/json")
-	w.Write([]byte(errorJSON))
 }
