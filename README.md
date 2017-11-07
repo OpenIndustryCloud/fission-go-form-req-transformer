@@ -1,4 +1,5 @@
 # fission-go-form-req-transformer
+[![Coverage Status](https://coveralls.io/repos/github/OpenIndustryCloud/fission-go-form-req-transformer/badge.svg?branch=master)](https://coveralls.io/github/OpenIndustryCloud/fission-go-form-req-transformer?branch=master)
 
 The `go` runtime uses the [`plugin` package](https://golang.org/pkg/plugin/) to dynamically load an HTTP handler.
 
