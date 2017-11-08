@@ -1,8 +1,6 @@
 groups:
 # - name: experimentation
 #   jobs: 
-#   - fission-python-echo-stage
-#   - merge-pr
 #   - test-pr
 #   - release
 #   - create-pr
@@ -66,6 +64,20 @@ resources:
     username: ((docker-gcr-username))
     password: ((docker-gcr-password))
     repository: ((docker-gcr-root))/((docker-image-newman))
+- name: docker-image-go-ci
+  type: docker-image
+  source:
+    email: ((docker-gcr-email))
+    username: ((docker-gcr-username))
+    password: ((docker-gcr-password))
+    repository: ((docker-gcr-root))/((docker-image-go-ci))
+- name: docker-image-go-builder
+  type: docker-image
+  source:
+    email: ((docker-gcr-email))
+    username: ((docker-gcr-username))
+    password: ((docker-gcr-password))
+    repository: ((docker-gcr-root))/((docker-image-go-builder))
 # Pull Requests
 - name: fission-function-pr
   type: pull-request
@@ -94,10 +106,13 @@ jobs:
   - aggregate:
     - get: docker-image-fission-cli
     - get: docker-image-newman
+    - get: docker-image-go-ci
+    - get: docker-image-go-builder
   - get: fission-function-src
     trigger: true
   - get: oic-ci-tasks-src
   - task: coverage
+    image: docker-image-go-ci
     file: oic-ci-tasks-src/go/coverage/coverage.yaml
     input_mapping: 
       task-src: oic-ci-tasks-src
@@ -105,6 +120,7 @@ jobs:
     params:
       REPOTOKEN: ((go-form-req-transformer-token))
   - task: build
+    image: docker-image-go-builder
     file: oic-ci-tasks-src/function/build/build_function.yaml
     input_mapping: 
       task-src: oic-ci-tasks-src
@@ -121,7 +137,7 @@ jobs:
       FISSION_URL: ((fission-url))
       FISSION_ROUTER: ((fission-router))
       FUNCTION_NAME: form-req-transformer
-      FUNCTION_ENVIRONMENT: python
+      FUNCTION_ENVIRONMENT: go
       CODE_PATH: function-src/form-req-transformer.so
       FUNCTION_METHOD: POST
     input_mapping: 
