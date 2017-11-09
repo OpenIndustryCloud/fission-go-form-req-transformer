@@ -26,12 +26,6 @@
 							"    pm.expect(pm.response.text()).to.include(\"html_body\");",
 							"});",
 							"",
-							"",
-							"pm.test(\"has non empty ticket object\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.ticketDetails).to.not.eql();",
-							"});",
-							"",
 							"pm.test(\"has non empty ticket object\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.ticketDetails).to.not.eql();",
@@ -57,6 +51,122 @@
 				"body": {
 					"mode": "raw",
 					"raw": "{\"event_id\":\"GQQPPJJtfd\",\"event_type\":\"form_response\",\"form_response\":{\"form_id\":\"krCLZ1\",\"token\":\"4\",\"submitted_at\":\"2017-11-06T10:25:13Z\",\"hidden\":{\"email\":\"xxxxx\",\"name\":\"xxxxx\",\"phone\":\"xxxxx\",\"policy\":\"xxxxx\"},\"definition\":{\"id\":\"krCLZ1\",\"title\":\"TV claim\",\"fields\":[{\"id\":\"XdVgAjnucXRP\",\"title\":\"Was there a theft or a deliberate event by a 3rd party?\",\"type\":\"yes_no\",\"allow_multiple_selections\":false,\"allow_other_choice\":false},{\"id\":\"AZbSqcXTKlED\",\"title\":\"Please enter a  crime/loss reference number.\",\"type\":\"short_text\",\"allow_multiple_selections\":false,\"allow_other_choice\":false},{\"id\":\"63241151\",\"title\":\"Please upload a detailed image of the damage\",\"type\":\"file_upload\",\"allow_multiple_selections\":false,\"allow_other_choice\":false},{\"id\":\"63241244\",\"title\":\"Please upload any photos of proof of purchase / ownership / box / receipt\",\"type\":\"file_upload\",\"allow_multiple_selections\":false,\"allow_other_choice\":false},{\"id\":\"63241572\",\"title\":\"Are you aware of anything else relevant to your claim that you would like to advise us of at this stage?\",\"type\":\"long_text\",\"allow_multiple_selections\":false,\"allow_other_choice\":false},{\"id\":\"63241542\",\"title\":\"If you have any other insurance or warranties covering your TV, please advise us of the company name.\",\"type\":\"short_text\",\"allow_multiple_selections\":false,\"allow_other_choice\":false},{\"id\":\"63241330\",\"title\":\"When did the incident happen?\",\"type\":\"date\",\"allow_multiple_selections\":false,\"allow_other_choice\":false},{\"id\":\"QYabj3uz2gs9\",\"title\":\"In as much detail as possible, please provide a full written account of what has happened to your TV, including where it happened.\",\"type\":\"long_text\",\"allow_multiple_selections\":false,\"allow_other_choice\":false},{\"id\":\"WwzqHPb0K9Wv\",\"title\":\"Make of the TV\",\"type\":\"short_text\",\"allow_multiple_selections\":false,\"allow_other_choice\":false},{\"id\":\"u2dzBoYFjbRA\",\"title\":\"Serial number of the TV\",\"type\":\"short_text\",\"allow_multiple_selections\":false,\"allow_other_choice\":false},{\"id\":\"63241939\",\"title\":\"We have made the following assumptions about your property, you and anyone living with you\",\"type\":\"legal\",\"allow_multiple_selections\":false,\"allow_other_choice\":false},{\"id\":\"lGCVB9tse6Re\",\"title\":\"Model number of the TV\",\"type\":\"short_text\",\"allow_multiple_selections\":false,\"allow_other_choice\":false},{\"id\":\"XiKbgOrX1OAp\",\"title\":\"Do you still have the TV in your possession?\",\"type\":\"yes_no\",\"allow_multiple_selections\":false,\"allow_other_choice\":false},{\"id\":\"63391165\",\"title\":\"What was the purchase price of the TV?\",\"type\":\"number\",\"allow_multiple_selections\":false,\"allow_other_choice\":false}]},\"answers\":[{\"type\":\"boolean\",\"boolean\":true,\"field\":{\"id\":\"XdVgAjnucXRP\",\"type\":\"yes_no\"}},{\"type\":\"text\",\"text\":\"DU00000000\",\"field\":{\"id\":\"AZbSqcXTKlED\",\"type\":\"short_text\"}},{\"type\":\"file_url\",\"file_url\":\"https://admin.typeform.com/form/results/file/download/krCLZ1/63241151/97750857a9d3-22228398_888332207989782_5676320169463975335_n.jpg\",\"field\":{\"id\":\"63241151\",\"type\":\"file_upload\"}},{\"type\":\"file_url\",\"file_url\":\"https://admin.typeform.com/form/results/file/download/krCLZ1/63241244/e6cc84865de7-22405371_888332421323094_6861338905885136899_n.jpg\",\"field\":{\"id\":\"63241244\",\"type\":\"file_upload\"}},{\"type\":\"text\",\"text\":\"None\",\"field\":{\"id\":\"63241572\",\"type\":\"long_text\"}},{\"type\":\"text\",\"text\":\"None\",\"field\":{\"id\":\"63241542\",\"type\":\"short_text\"}},{\"type\":\"date\",\"date\":\"2017-10-01\",\"field\":{\"id\":\"63241330\",\"type\":\"date\"}},{\"type\":\"text\",\"text\":\"what happened\",\"field\":{\"id\":\"QYabj3uz2gs9\",\"type\":\"long_text\"}},{\"type\":\"text\",\"text\":\"LG\",\"field\":{\"id\":\"WwzqHPb0K9Wv\",\"type\":\"short_text\"}},{\"type\":\"text\",\"text\":\"SerialNo\",\"field\":{\"id\":\"u2dzBoYFjbRA\",\"type\":\"short_text\"}},{\"type\":\"boolean\",\"boolean\":true,\"field\":{\"id\":\"63241939\",\"type\":\"legal\"}},{\"type\":\"text\",\"text\":\"ModelNo\",\"field\":{\"id\":\"lGCVB9tse6Re\",\"type\":\"short_text\"}},{\"type\":\"boolean\",\"boolean\":true,\"field\":{\"id\":\"XiKbgOrX1OAp\",\"type\":\"yes_no\"}},{\"type\":\"number\",\"number\":20000,\"field\":{\"id\":\"63391165\",\"type\":\"number\"}}]}}"
+				},
+				"url": {
+					"raw": "http://localhost:8083",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "transform-req empty",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Echo - Correct HTTP Code\", function() {",
+							"    pm.response.to.have.status(200);",
+							"})",
+							"",
+							"pm.test(\"Echo - Received JSON back\", function() {",
+							"    pm.response.to.be.json;",
+							"})",
+							"",
+							"pm.test(\"Echo - status code is returned in response\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"status\");",
+							"});",
+							"",
+							"pm.test(\"Echo - has non empty status\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.not.eql();",
+							"});",
+							"",
+							"pm.test(\"Echo - has non empty error details\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.not.eql();",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8083",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "transform-req malform json input",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Echo - Correct HTTP Code\", function() {",
+							"    pm.response.to.have.status(200);",
+							"})",
+							"",
+							"pm.test(\"Echo - Received JSON back\", function() {",
+							"    pm.response.to.be.json;",
+							"})",
+							"",
+							"pm.test(\"Echo - status code is returned in response\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"status\");",
+							"});",
+							"",
+							"pm.test(\"Echo - has non empty status\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.not.eql();",
+							"});",
+							"",
+							"pm.test(\"Echo - has non empty error details\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.not.eql();",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
 				},
 				"url": {
 					"raw": "http://localhost:8083",
