@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -62,6 +64,19 @@ func TestHandler(t *testing.T) {
 		if ctype := rr.Header().Get("Content-Type"); ctype != "application/json" {
 			t.Errorf("content type header does not match: got %v want %v",
 				ctype, "application/json")
+		}
+
+		//check response content
+		res, err := ioutil.ReadAll(rr.Body)
+		if err != nil {
+			t.Error(err) //Something is wrong while read res
+		}
+
+		got := TranformedData{}
+		err = json.Unmarshal(res, &got)
+
+		if err != nil && got.TicketDetails.Ticket.Subject != "" {
+			t.Errorf("%q. compute weather risk() = %v, want %v", tt.name, got, "non empty")
 		}
 
 	}
