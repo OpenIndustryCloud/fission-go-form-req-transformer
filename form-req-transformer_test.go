@@ -23,14 +23,11 @@ func TestHandler(t *testing.T) {
 	readerTV := strings.NewReader(userJsonTVClaim)
 	//Create request with JSON body
 	reqTV, err := http.NewRequest("POST", "", readerTV)
-	if err != nil {
-		t.Error(err) //Something is wrong while sending request
-	}
-
-	//Convert string to reader
-	readerStorm := strings.NewReader(userJsonStormClaim)
 	//Create request with JSON body
-	reqStorm, err := http.NewRequest("POST", "", readerStorm)
+	reqStorm, err := http.NewRequest("POST", "", strings.NewReader(userJsonStormClaim))
+	// empty request
+	reqEmpty, err := http.NewRequest("POST", "", strings.NewReader(""))
+
 	if err != nil {
 		t.Error(err) //Something is wrong while sending request
 	}
@@ -48,6 +45,7 @@ func TestHandler(t *testing.T) {
 	}{
 		{"Status200TV", args{rr, reqTV}},
 		{"Status200Storm", args{rr, reqStorm}},
+		{"Status200Storm", args{rr, reqEmpty}},
 	}
 	for _, tt := range tests {
 		// call ServeHTTP method

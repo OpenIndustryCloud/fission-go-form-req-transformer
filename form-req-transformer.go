@@ -9,6 +9,7 @@ request along side Weather API Input Data
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -45,11 +46,11 @@ const (
 	STORM_SHORT_VIDEO     = "63907004"
 )
 
-// func main() {
-// 	println("staritng app..")
-// 	http.HandleFunc("/", Handler)
-// 	http.ListenAndServe(":8083", nil)
-// }
+func main() {
+	println("staritng app..")
+	http.HandleFunc("/", Handler)
+	http.ListenAndServe(":8083", nil)
+}
 
 func Handler(w http.ResponseWriter, r *http.Request) {
 
@@ -64,7 +65,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	//transform type form data manually
 	transformedData := transformData(typeFormdata)
 	transformedDataJSON, err := json.Marshal(&transformedData)
-	//fmt.Println("Type form data after transformatin -----> ", string(transformedDataJSON))
+	fmt.Println("Type form data after transformatin -----> ", string(transformedDataJSON))
 	if err != nil {
 		createErrorResponse(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -108,7 +109,7 @@ func transformData(typeFormdata TypeFormData) TranformedData {
 		case DATE_FEILD:
 			ticketBody += " : " + answer.Date + PARA_END
 		case FILE_UPLOAD:
-			ticketBody += field.ID + " : " + answer.FileURL + PARA_END
+			ticketBody += " <a href='" + answer.FileURL + "'>" + answer.FileURL + "</a>" + PARA_END
 		default:
 			ticketBody += " : " + answer.Text + PARA_END
 		}
@@ -160,13 +161,14 @@ func transformData(typeFormdata TypeFormData) TranformedData {
 		}
 		//update ticket specific data
 		transformedData.TicketDetails = ticketDetails
+		transformedData.Status = 200
 	}
 	return transformedData
 }
 
 func createErrorResponse(w http.ResponseWriter, message string, status int64) {
 	errorJSON, _ := json.Marshal(&Error{
-		Code:    status,
+		Status:  status,
 		Message: message})
 	//Send custom error message to caller
 	w.Header().Set("content-type", "application/json")
@@ -174,16 +176,17 @@ func createErrorResponse(w http.ResponseWriter, message string, status int64) {
 }
 
 type Error struct {
-	Code    int64  `json:"status"`
+	Status  int64  `json:"status"`
 	Message string `json:"message"`
 }
 
 //output data
 type TranformedData struct {
-	TicketDetails   TicketDetails   `json:"ticketDetails,omitempty"`
-	WeatherAPIInput WeatherAPIInput `json:"weatherAPIInput,omitempty"`
+	Status          int64           `json:"status,omitempty"`
+	TicketDetails   TicketDetails   `json:"ticket_details,omitempty"`
+	WeatherAPIInput WeatherAPIInput `json:"weather_api_input,omitempty"`
 	TVClaimData     TVClaimData     `json:"tv_claim_data,omitempty"`
-	StromClaimData  StromClaimData  `json:"strom_claim_data,omitempty"`
+	StromClaimData  StromClaimData  `json:"storm_claim_data,omitempty"`
 }
 
 type TVClaimData struct {
@@ -271,7 +274,7 @@ type TicketDetails struct {
 		Status   string `json:"status"`
 		Comment  struct {
 			HTMLBody string   `json:"html_body"`
-			Uploads  []string `json:"uploads"`
+			Uploads  []string `json:"uploads,omitempty"`
 		} `json:"comment"`
 		CustomFields []struct {
 			ID    int    `json:"id"`
