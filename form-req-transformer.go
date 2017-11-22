@@ -46,11 +46,11 @@ const (
 	STORM_SHORT_VIDEO     = "63907004"
 )
 
-func main() {
-	println("staritng app..")
-	http.HandleFunc("/", Handler)
-	http.ListenAndServe(":8083", nil)
-}
+// func main() {
+// 	println("staritng app..")
+// 	http.HandleFunc("/", Handler)
+// 	http.ListenAndServe(":8083", nil)
+// }
 
 func Handler(w http.ResponseWriter, r *http.Request) {
 
@@ -64,10 +64,11 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	//transform type form data manually
 	transformedData := transformData(typeFormdata)
+	transformedData.Status = 200
 	transformedDataJSON, err := json.Marshal(&transformedData)
 	fmt.Println("Type form data after transformatin -----> ", string(transformedDataJSON))
 	if err != nil {
-		createErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		createErrorResponse(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -84,6 +85,10 @@ func transformData(typeFormdata TypeFormData) TranformedData {
 	var claimType = typeFormdata.FormResponse.Definition.Title
 
 	//update Ticket details
+	ticketDetails.Ticket.EventID = typeFormdata.EventID
+	ticketDetails.Ticket.Token = typeFormdata.FormResponse.Token
+	ticketDetails.Ticket.SubmittedAt = typeFormdata.FormResponse.SubmittedAt
+
 	ticketDetails.Ticket.Subject = claimType
 	ticketDetails.Ticket.Requester.Email = typeFormdata.FormResponse.Hidden.Email
 	ticketDetails.Ticket.Requester.Name = typeFormdata.FormResponse.Hidden.Name
@@ -109,7 +114,7 @@ func transformData(typeFormdata TypeFormData) TranformedData {
 		case DATE_FEILD:
 			ticketBody += " : " + answer.Date + PARA_END
 		case FILE_UPLOAD:
-			ticketBody += " <a href='" + answer.FileURL + "'>" + answer.FileURL + "</a>" + PARA_END
+			//ticketBody += " <a href='" + answer.FileURL + "'>" + answer.FileURL + "</a>" + PARA_END
 		default:
 			ticketBody += " : " + answer.Text + PARA_END
 		}
@@ -161,28 +166,28 @@ func transformData(typeFormdata TypeFormData) TranformedData {
 		}
 		//update ticket specific data
 		transformedData.TicketDetails = ticketDetails
-		transformedData.Status = 200
 	}
 	return transformedData
 }
 
-func createErrorResponse(w http.ResponseWriter, message string, status int64) {
+func createErrorResponse(w http.ResponseWriter, message string, status int) {
 	errorJSON, _ := json.Marshal(&Error{
 		Status:  status,
 		Message: message})
 	//Send custom error message to caller
+	w.WriteHeader(status)
 	w.Header().Set("content-type", "application/json")
 	w.Write([]byte(errorJSON))
 }
 
 type Error struct {
-	Status  int64  `json:"status"`
+	Status  int    `json:"status"`
 	Message string `json:"message"`
 }
 
 //output data
 type TranformedData struct {
-	Status          int64           `json:"status,omitempty"`
+	Status          int             `json:"status,omitempty"`
 	TicketDetails   TicketDetails   `json:"ticket_details,omitempty"`
 	WeatherAPIInput WeatherAPIInput `json:"weather_api_input,omitempty"`
 	TVClaimData     TVClaimData     `json:"tv_claim_data,omitempty"`
@@ -276,17 +281,18 @@ type TicketDetails struct {
 			HTMLBody string   `json:"html_body"`
 			Uploads  []string `json:"uploads,omitempty"`
 		} `json:"comment"`
-		CustomFields []struct {
-			ID    int    `json:"id"`
-			Value string `json:"value"`
-		} `json:"custom_fields,omitempty"`
-		Requester struct {
+		CustomFields []CustomFields `json:"custom_fields,omitempty"`
+		Requester    struct {
 			LocaleID     int    `json:"locale_id"`
 			Name         string `json:"name"`
 			Email        string `json:"email"`
 			Phone        string `json:"phone"`
 			PolicyNumber string `json:"policy_number"`
 		} `json:"requester"`
+		TicketFormID int64     `json:"ticket_form_id"`
+		EventID      string    `json:"event_id"`
+		Token        string    `json:"token"`
+		SubmittedAt  time.Time `json:"submitted_at"`
 	} `json:"ticket"`
 }
 
@@ -294,4 +300,9 @@ type WeatherAPIInput struct {
 	City    string `json:"city,omitempty"`
 	Country string `json:"country,omitempty"`
 	Date    string `json:"date,omitempty"` //YYYYMMDD
+}
+
+type CustomFields struct {
+	ID    int64  `json:"id"`
+	Value string `json:"value"`
 }
