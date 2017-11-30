@@ -147,8 +147,7 @@ func transformData(typeFormdata TypeFormData) TranformedData {
 				transformedData.WeatherAPIInput.Date = strings.Replace(answer.Date, "-", "", 2)
 				transformedData.TVClaimData.IncidentDate = answer.Date
 			case TV_PURCHASE_PRICE:
-				transformedData.WeatherAPIInput.City = answer.Text
-				transformedData.TVClaimData.TVPrice = answer.Text
+				transformedData.TVClaimData.TVPrice = answer.Number
 			case TV_CRIME_REF:
 				transformedData.TVClaimData.CrimeRef = answer.Text
 			case TV_MODEL_NO:
@@ -195,7 +194,7 @@ type TranformedData struct {
 }
 
 type TVClaimData struct {
-	TVPrice         string `json:"tv_price,omitempty"`
+	TVPrice         int    `json:"tv_price,omitempty"`
 	CrimeRef        string `json:"crime_ref,omitempty"`
 	IncidentDate    string `json:"incident_date,omitempty"`
 	TVModelNo       string `json:"tv_model_no,omitempty"`
