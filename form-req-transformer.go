@@ -1,11 +1,9 @@
 package main
 
-/*
-This API serves a web hook for TYPE FORM
-and transform the input JSON to Zen Desk equivalent
-request along side Weather API Input Data
-
-*/
+// Package -
+// This API serves a web hook for TYPE FORM
+// and transform the input JSON to Zen Desk equivalent
+// request along side Weather API Input Data
 
 import (
 	"encoding/json"
@@ -18,12 +16,15 @@ import (
 )
 
 const (
+	//Type form Data Type
 	BOOLEAN_FEILD = "boolean"
 	TEXT_FEILD    = "text"
 	DATE_FEILD    = "date"
 	FILE_UPLOAD   = "file_upload"
-	PARA_START    = "<p>"
-	PARA_END      = "</p><hr>"
+
+	//HTML tags
+	PARA_START = "<p>"
+	PARA_END   = "</p><hr>"
 
 	//TV FIELD IDs
 	TV_CLAIM          = "TV claim"
@@ -52,31 +53,34 @@ const (
 // 	http.ListenAndServe(":8083", nil)
 // }
 
+// Handler method transform incoming request payload
+// to Zendesk Specific Format (JSON to JSON conveion)
 func Handler(w http.ResponseWriter, r *http.Request) {
 
-	//Marhsal TYPE FORM DATA to TypeFormData struct
+	// Marhsal TYPE FORM DATA to TypeFormData struct
 	var typeFormdata TypeFormData
 	err := json.NewDecoder(r.Body).Decode(&typeFormdata)
-	if err == io.EOF || err != nil {
+	if err == io.EOF || err != nil { // create error response on empty payload or malform JSON
 		createErrorResponse(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	//transform type form data manually
+	// transform TypeForm JSON to hold Zendesk Specific JSON Data
 	transformedData := transformData(typeFormdata)
 	transformedData.Status = 200
 	transformedDataJSON, err := json.Marshal(&transformedData)
 	fmt.Println("Type form data after transformatin -----> ", string(transformedDataJSON))
-	if err != nil {
+	if err != nil { // create error response on error
 		createErrorResponse(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
+	//write transformed JSON data
 	w.Header().Set("content-type", "application/json")
 	w.Write([]byte(string(transformedDataJSON)))
 }
 
-//transform Type form data
+// transformData - Map TYPEFORM data to Zendesk JSON Schema,
 func transformData(typeFormdata TypeFormData) TranformedData {
 	//populate Fresh Desk Specific Struct
 	var ticketDetails = TicketDetails{}
@@ -96,30 +100,32 @@ func transformData(typeFormdata TypeFormData) TranformedData {
 	ticketDetails.Ticket.Requester.PolicyNumber = typeFormdata.FormResponse.Hidden.Policy
 	ticketDetails.Ticket.Requester.LocaleID = 1
 
-	//default data
+	// default ticket data
 	ticketDetails.Ticket.Status = "new"
 	ticketDetails.Ticket.Priority = "normal"
 	ticketDetails.Ticket.Type = "incident"
 	ticketBody := ""
 
-	//populate Descripton
+	//populate Ticket Descripton by adding all Question and Answers
 	for i, field := range typeFormdata.FormResponse.Definition.Fields {
 		answer := typeFormdata.FormResponse.Answers[i]
 		//add all data to ticket body
-		ticketBody += PARA_START + "<b>" + field.Title + "</b>"
-
 		switch field.Type {
 		case BOOLEAN_FEILD:
+			ticketBody += PARA_START + "<b>" + field.Title + "</b>"
 			ticketBody += strconv.FormatBool(answer.Boolean) + PARA_END
 		case DATE_FEILD:
+			ticketBody += PARA_START + "<b>" + field.Title + "</b>"
 			ticketBody += " : " + answer.Date + PARA_END
 		case FILE_UPLOAD:
-			//ticketBody += " <a href='" + answer.FileURL + "'>" + answer.FileURL + "</a>" + PARA_END
+			//ticketBody += PARA_START + "<b>" + field.Title + "</b>"
+			// ticketBody += " <a href='" + answer.FileURL + "'>" + answer.FileURL + "</a>" + PARA_END
 		default:
+			ticketBody += PARA_START + "<b>" + field.Title + "</b>"
 			ticketBody += " : " + answer.Text + PARA_END
 		}
 		ticketDetails.Ticket.Comment.HTMLBody = ticketBody
-		//claim specific important data
+		//claim specific important data to be added as custom fields
 		if strings.Compare(claimType, STORM_SURGE_CLAIM) == 0 {
 			//for Storm Surge Claims
 			switch field.ID {
@@ -169,6 +175,8 @@ func transformData(typeFormdata TypeFormData) TranformedData {
 	return transformedData
 }
 
+// createErrorResponse - this function forms a error reposne with
+// error message and http code
 func createErrorResponse(w http.ResponseWriter, message string, status int) {
 	errorJSON, _ := json.Marshal(&Error{
 		Status:  status,
@@ -179,12 +187,13 @@ func createErrorResponse(w http.ResponseWriter, message string, status int) {
 	w.Write([]byte(errorJSON))
 }
 
+// Error - error object
 type Error struct {
 	Status  int    `json:"status"`
 	Message string `json:"message"`
 }
 
-//output data
+// Output Schema
 type TranformedData struct {
 	Status          int             `json:"status,omitempty"`
 	TicketDetails   TicketDetails   `json:"ticket_details,omitempty"`
@@ -295,13 +304,14 @@ type TicketDetails struct {
 	} `json:"ticket"`
 }
 
+type CustomFields struct {
+	ID    int64  `json:"id"`
+	Value string `json:"value"`
+}
+
+// WeatherAPIInput weather specific data
 type WeatherAPIInput struct {
 	City    string `json:"city,omitempty"`
 	Country string `json:"country,omitempty"`
 	Date    string `json:"date,omitempty"` //YYYYMMDD
-}
-
-type CustomFields struct {
-	ID    int64  `json:"id"`
-	Value string `json:"value"`
 }
