@@ -1,14 +1,15 @@
 [![Coverage Status](https://coveralls.io/repos/github/OpenIndustryCloud/fission-go-form-req-transformer/badge.svg?branch=master)](https://coveralls.io/github/OpenIndustryCloud/fission-go-form-req-transformer?branch=master)
 
-# TYYPEFORM request transformation API (JSON to JSON)
+# TYPEFORM request transformation API
 
-`form-data-transformer.go` is an API which accepts JSON payload of TYPEFORM and transform the JSON data which can used by other APIs to query weather info or registering a ticket to ZenDesk.
+`form-data-transformer.go` is an API which accepts JSON payload of TYPEFORM and transform the JSON data which can used by other APIs to query weather info or registering a ticket to [Zendesk](https://www.zendesk.com/).
+
 
 It performs JSON to JSON tranformation by mapping data manually.
 
 ## API reference
 
-- [TYPEFORM JSON Response](https://developer.typeform.com/webhooks/example-response/)
+- [TYPEFORM JSON](https://developer.typeform.com/webhooks/example-response/)
 - [Zendesk API](https://developer.zendesk.com/rest_api/docs/core/tickets)
 
 ## Authentication
@@ -32,6 +33,7 @@ Empty Payload or malformed JSON would result in error reponse.
 ```
 
 - Response
+
 ```
 {"status":200,"ticket_details":{"ticket":{"type":"incident","subject":"Storm surge claim","priority":"normal","status":"new","comment":{"html_body":"\u003cp\u003e\u003cb\u003eAre you still have possession of the damage items (i.e. damaged guttering)?\u003c/b\u003e : \u003c/p\u003e\u003chr\u003e\u003cp\u003e\u003cb\u003eIf there has been any recent maintenance carried out on your home, please describe it\u003c/b\u003e : no\u003c/p\u003e\u003chr\u003e\u003cp\u003e\u003cb\u003eIf you have any other insurance or warranties covering your home, please advise us of the company name.\u003c/b\u003e : no\u003c/p\u003e\u003chr\u003e\u003cp\u003e\u003cb\u003eWe have made the following assumptions about your property, you and anyone living with you\u003c/b\u003e : \u003c/p\u003e\u003chr\u003e\u003cp\u003e\u003cb\u003eWhen did the incident happen?\u003c/b\u003e : 2017-11-02\u003c/p\u003e\u003chr\u003e\u003cp\u003e\u003cb\u003eIn as much detail as possible, please use the text box below to describe the full extent of the damage to your home and how you discovered it.\u003c/b\u003e : A cow was blown on top of my roof and destroyed tiles.\u003c/p\u003e\u003chr\u003e\u003cp\u003e\u003cb\u003ePlease describe the details of the condition of your home prior to discovering the damage\u003c/b\u003e : perfect\u003c/p\u003e\u003chr\u003e\u003cp\u003e\u003cb\u003eAre you aware of anything else relevant to your claim that you would like to advise us of at this stage?\u003c/b\u003e : nothing\u003c/p\u003e\u003chr\u003e\u003cp\u003e\u003cb\u003eWhere did the incident happen? (City/town name)\u003c/b\u003e : london\u003c/p\u003e\u003chr\u003e\u003cp\u003e\u003cb\u003eWould you like to upload more images?\u003c/b\u003e : \u003c/p\u003e\u003chr\u003e"},"requester":{"locale_id":1,"name":"Maarten","email":"mectors@gmail.com","phone":"12345678","policy_number":"12345678"},"ticket_form_id":0,"event_id":"SChin7eteE","token":"6","submitted_at":"2017-11-06T14:13:27Z"}},"weather_api_input":{"city":"london","date":"20171102"},"tv_claim_data":{"tv_reciept_image_url":""},"storm_claim_data":{"incident_place":"london","incident_date":"2017-11-02","damage_image_url_2":"https://admin.typeform.com/form/results/file/download/H8mm3s/j79cNctIvogK/aaee97a02b39-1.cow_on_a_roof.jpg"}}
 ```
